@@ -24,6 +24,8 @@ import {
   View,
   ViewStyle,
   StatusBar,
+  findNodeHandle,
+  AccessibilityInfo,
 } from 'react-native';
 import { useDetectDevice } from '../../toolkits';
 import { useDeviceOrientation } from '../../useDeviceOrientation';
@@ -116,6 +118,21 @@ const DropdownComponent: <T>(
     useImperativeHandle(currentRef, () => {
       return { open: eventOpen, close: eventClose };
     });
+
+    useEffect(() => {
+      if (visible) {
+        setTimeout(() => {
+          // Focus on open (for acessibility)
+          const tag = findNodeHandle(refList.current);
+          if (tag === null) {
+            // eslint-disable-next-line no-console
+            console.error('Cannot find tag');
+          } else {
+            AccessibilityInfo.setAccessibilityFocus(tag);
+          }
+        }, 200);
+      }
+    }, [visible]);
 
     useEffect(() => {
       return eventClose;
